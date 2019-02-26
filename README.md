@@ -11,7 +11,12 @@ For each value returned by a path, you'll also get the keys & indexes needed to 
 This fork is owned and currently maintained by [WTFTeam](https://lab.wtfteam.pro). It's based on [that one](https://github.com/JumboInteractiveLimited/jsonpath) from Jumbo Interactive Limited, which sequentally based/copied from NodePrime/jsonpath Github repository, currently unavailable. The MIT license on this code is inherited from Jumbo Interactive Limited fork, so we can support and maintain this library freely. If there is by any chance someone's proprietary code, you can reach us by ``abuse <at> wtfteam <dot> pro`` with details. Unless proved against all code here is licensed under MIT.
   
 ### Go Package
+
+Start with
+
+```shell
 go get lab.wtfteam.pro/wtfteam/jsonpath
+```
 
 ```go
 paths, err := jsonpath.ParsePaths(pathStrings ...string) {
@@ -67,9 +72,6 @@ Expressions
 - parentheses `(2 < (3 * 5))`
 - static values like (`true`, `false`)
 - `@.value > 0.5`
-
-Example: this will only return tags of all items that match this expression.
-`$.Items[*]?(@.title == "A Tale of Two Cities").tags`
 
 Example:
 
