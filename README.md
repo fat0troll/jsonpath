@@ -8,14 +8,20 @@ For each value returned by a path, you'll also get the keys & indexes needed to 
 
 ## The history of a library
 
-This fork is owned and currently maintained by [WTFTeam](https://lab.wtfteam.pro). It's based on [that one](https://github.com/JumboInteractiveLimited/jsonpath) from Jumbo Interactive Limited, which sequentally based/copied from NodePrime/jsonpath Github repository, currently unavailable. The MIT license on this code is inherited from Jumbo Interactive Limited fork, so we can support and maintain this library freely. If there is by any chance someone's proprietary code, you can reach us by ``abuse <at> wtfteam <dot> pro`` with details. Unless proved against all code here is licensed under MIT.
-  
+This fork is owned and currently maintained by [WTFTeam](https://wtfteam.pro). It's based on [that one](https://github.com/JumboInteractiveLimited/jsonpath) from Jumbo Interactive Limited, which sequentally based/copied from NodePrime/jsonpath Github repository, currently unavailable. The MIT license on this code is inherited from Jumbo Interactive Limited fork, so we can support and maintain this library freely. If there is by any chance someone's proprietary code, you can reach us by ``abuse <at> wtfteam <dot> pro`` with details. Unless proved against all code here is licensed under MIT.
+
+### Mirrors and development
+
+The main development goes in [fat0troll's Gitea](https://source.hodakov.me/libraries/jsonpath). There is an official mirror on [GitHub](https://github.com/welltrainedfolks/jsonpath), but we do not guarantee that PRs, opened at GitHub, will be merged.
+
+The canonical import path hosted by [giredore](https://sources.dev.pztrn.name/pztrn/giredore), our own Go packages redirector.
+
 ### Go Package
 
 Start with
 
 ```shell
-go get lab.wtfteam.pro/wtfteam/jsonpath
+go get source.wtfteam.pro/libraries/jsonpath
 ```
 
 ```go
@@ -46,6 +52,7 @@ if eval.Error != nil {
 `eval.Next()` will traverse JSON until another value is found.  This has the potential of traversing the entire JSON document in an attempt to find one.  If you prefer to have more control over traversing, use the `eval.Iterate()` method.  It will return after every scanned JSON token and return `([]*Result, bool)`.  This array will usually be empty, but occasionally contain results.
 
 ### Path Syntax
+
 All paths start from the root node `$`.  Similar to getting properties in a JavaScript object, a period `.title` or brackets `["title"]` are used.  
   
 Syntax|Meaning|Examples
