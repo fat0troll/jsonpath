@@ -7,6 +7,7 @@ linters:
     - gocritic
     - funlen
     - godox
+    - gocyclo # is deprecated
 linters-settings:
   lll:
     line-length: 180

@@ -150,6 +150,7 @@ func TestExpressions(t *testing.T) {
 		// trim EOF
 		items = items[0 : len(items)-1]
 		itemsPost, err := infixToPostFix(items)
+
 		if as.NoError(err, "Could not transform to postfix\nTest: %q", test.input) {
 			val, err := evaluatePostFix(itemsPost, test.fields)
 			if as.NoError(err, "Could not evaluate postfix\nTest Input: %q\nTest Values:%q\nError:%q", test.input, test.fields, err) {
@@ -210,17 +211,18 @@ func TestBadExpressions(t *testing.T) {
 		items := readerToArray(lexer)
 		// trim EOF
 		items = items[0 : len(items)-1]
+
 		itemsPost, err := infixToPostFix(items)
 		if err != nil {
 			as.True(strings.Contains(err.Error(), test.expectedErrorSubstring), "Test Input: %q\nError %q does not contain %q", test.input, err.Error(), test.expectedErrorSubstring)
 			continue
 		}
+
 		if as.NoError(err, "Could not transform to postfix\nTest: %q", test.input) {
 			_, err := evaluatePostFix(itemsPost, test.fields)
 			if as.Error(err, "Could not evaluate postfix\nTest Input: %q\nTest Values:%q\nError:%s", test.input, test.fields, err) {
 				as.True(strings.Contains(err.Error(), test.expectedErrorSubstring), "Test Input: %q\nError %s does not contain %q", test.input, err.Error(), test.expectedErrorSubstring)
 			}
-
 		}
 	}
 }

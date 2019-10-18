@@ -72,6 +72,7 @@ func TestPathQuery(t *testing.T) {
 
 func newResult(value string, typ int, keys ...interface{}) Result {
 	keysChanged := make([]interface{}, len(keys))
+
 	for i, k := range keys {
 		switch v := k.(type) {
 		case string:
@@ -90,6 +91,7 @@ func newResult(value string, typ int, keys ...interface{}) Result {
 
 func toResultArray(e *Eval) []Result {
 	vals := make([]Result, 0)
+
 	for {
 		if r, ok := e.Next(); ok {
 			if r != nil {
@@ -99,5 +101,6 @@ func toResultArray(e *Eval) []Result {
 			break
 		}
 	}
+
 	return vals
 }

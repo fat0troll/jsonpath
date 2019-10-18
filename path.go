@@ -49,9 +49,11 @@ func genIndexKey(tr tokenReader) (*operator, error) {
 	case pathWildcard:
 		k.typ = opTypeIndexWild
 		k.indexStart = 0
+
 		if t, ok = tr.next(); !ok {
 			return nil, errors.New("expected ] after *, but got none")
 		}
+
 		if t.typ != pathBracketRight {
 			return nil, fmt.Errorf("expected ] after * instead of %q", t.val)
 		}
@@ -196,8 +198,8 @@ func tokensToOperators(tr tokenReader) (*Path, error) {
 			if err != nil {
 				return nil, err
 			}
-			q.operators = append(q.operators, k)
 
+			q.operators = append(q.operators, k)
 		case pathKey:
 			keyName := p.val
 
@@ -220,7 +222,6 @@ func tokensToOperators(tr tokenReader) (*Path, error) {
 			)
 		case pathWildcard:
 			q.operators = append(q.operators, &operator{typ: opTypeNameWild})
-
 		case pathValue:
 			q.captureEndValue = true
 		case pathWhere:

@@ -25,6 +25,7 @@ func NewReaderLexer(rr io.Reader, initial stateFn) *ReaderLexer {
 		lex:      newLex(initial),
 		lexeme:   bytes.NewBuffer(make([]byte, 0, 100)),
 	}
+
 	return &l
 }
 
@@ -36,6 +37,7 @@ func (l *ReaderLexer) take() int {
 	nr := l.nextByte
 	l.nextByte = noValue
 	l.lexeme.WriteByte(byte(nr))
+
 	return nr
 }
 
@@ -52,6 +54,7 @@ looper:
 		if err == io.EOF {
 			return errors.New("unexpected EOF in string")
 		}
+
 		l.lexeme.WriteByte(curByte)
 
 		if curByte == '"' {
@@ -62,12 +65,14 @@ looper:
 				if err == io.EOF {
 					return errors.New("unexpected EOF in string")
 				}
+
 				l.lexeme.WriteByte(curByte)
 			}
 		}
 
 		previous = curByte
 	}
+
 	return nil
 }
 
@@ -83,13 +88,15 @@ func (l *ReaderLexer) peek() int {
 	}
 
 	l.nextByte = int(r)
+
 	return l.nextByte
 }
 
 func (l *ReaderLexer) emit(t int) {
 	l.setItem(t, l.pos, l.lexeme.Bytes())
-	l.pos += Pos(l.lexeme.Len())
 	l.hasItem = true
+
+	l.pos += Pos(l.lexeme.Len())
 
 	if t == lexEOF {
 		// Do not capture eof character to match slice_lexer
@@ -105,6 +112,7 @@ func (l *ReaderLexer) emit(t int) {
 	for l.nextByte != eof {
 		if l.nextByte == ' ' || l.nextByte == '\t' || l.nextByte == '\r' || l.nextByte == '\n' {
 			l.pos++
+
 			r, err := l.bufInput.ReadByte()
 			if err == io.EOF {
 				l.nextByte = eof
@@ -130,6 +138,7 @@ func (l *ReaderLexer) ignore() {
 
 func (l *ReaderLexer) next() (*Item, bool) {
 	l.lexeme.Reset()
+
 	for {
 		if l.currentStateFn == nil {
 			break
@@ -142,19 +151,23 @@ func (l *ReaderLexer) next() (*Item, bool) {
 			return &l.item, true
 		}
 	}
+
 	return &l.item, false
 }
 
 func (l *ReaderLexer) errorf(format string, args ...interface{}) stateFn {
 	l.setItem(lexError, l.pos, []byte(fmt.Sprintf(format, args...)))
 	l.lexeme.Truncate(0)
+
 	l.hasItem = true
+
 	return nil
 }
 
 func (l *ReaderLexer) reset() {
 	l.bufInput.Reset(l.input)
 	l.lexeme.Reset()
+
 	l.nextByte = noValue
 	l.pos = 0
 	l.lex = newLex(l.initialState)

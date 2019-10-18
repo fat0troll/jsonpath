@@ -326,6 +326,7 @@ func (b *exprBucket) evaluate() (bool, error) {
 func itemMatchOperator(loc interface{}, op *operator) bool {
 	topBytes, isKey := loc.([]byte)
 	topInt, isIndex := loc.(int)
+
 	if isKey {
 		switch op.typ {
 		case opTypeNameWild:
@@ -342,5 +343,6 @@ func itemMatchOperator(loc interface{}, op *operator) bool {
 			return topInt >= op.indexStart && (!op.hasIndexEnd || topInt <= op.indexEnd)
 		}
 	}
+
 	return false
 }

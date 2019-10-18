@@ -17,6 +17,7 @@ func NewSliceLexer(input []byte, initial stateFn) *SliceLexer {
 		lex:   newLex(initial),
 		input: input,
 	}
+
 	return l
 }
 
@@ -24,8 +25,10 @@ func (l *SliceLexer) take() int {
 	if int(l.pos) >= len(l.input) {
 		return eof
 	}
+
 	r := int(l.input[l.pos])
 	l.pos++
+
 	return r
 }
 
@@ -39,6 +42,7 @@ func (l *SliceLexer) takeString() error {
 
 	cur := int(l.input[curPos])
 	curPos++
+
 	if cur != '"' {
 		l.pos = curPos
 		return fmt.Errorf("expected \" as start of string instead of %#U", cur)
@@ -63,7 +67,9 @@ looper:
 
 		previous = cur
 	}
+
 	l.pos = curPos
+
 	return nil
 }
 
@@ -71,11 +77,13 @@ func (l *SliceLexer) peek() int {
 	if int(l.pos) >= len(l.input) {
 		return eof
 	}
+
 	return int(l.input[l.pos])
 }
 
 func (l *SliceLexer) emit(t int) {
 	l.setItem(t, l.start, l.input[l.start:l.pos])
+
 	l.hasItem = true
 
 	// Ignore whitespace after this token
@@ -114,13 +122,16 @@ func (l *SliceLexer) next() (*Item, bool) {
 			return &l.item, true
 		}
 	}
+
 	return &l.item, false
 }
 
 func (l *SliceLexer) errorf(format string, args ...interface{}) stateFn {
 	l.setItem(lexError, l.start, []byte(fmt.Sprintf(format, args...)))
+
 	l.start = l.pos
 	l.hasItem = true
+
 	return nil
 }
 

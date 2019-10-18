@@ -21,6 +21,7 @@ var pathTests = []lexTest{
 
 func TestValidPaths(t *testing.T) {
 	as := assert.New(t)
+
 	for _, test := range pathTests {
 		lexer := NewSliceLexer([]byte(test.input), PATH)
 		types := itemsToTypes(readerToArray(lexer))

@@ -24,8 +24,10 @@ func (s *intStack) pop() (int, bool) {
 	if s.len() == 0 {
 		return 0, false
 	}
+
 	v, _ := s.peek()
 	s.values = s.values[:len(s.values)-1]
+
 	return v, true
 }
 
@@ -33,7 +35,9 @@ func (s *intStack) peek() (int, bool) {
 	if s.len() == 0 {
 		return 0, false
 	}
+
 	v := s.values[len(s.values)-1]
+
 	return v, true
 }
 
@@ -61,8 +65,10 @@ func (s *stack) pop() (interface{}, bool) {
 	if s.len() == 0 {
 		return nil, false
 	}
+
 	v, _ := s.peek()
 	s.values = s.values[:len(s.values)-1]
+
 	return v, true
 }
 
@@ -70,7 +76,9 @@ func (s *stack) peek() (interface{}, bool) {
 	if s.len() == 0 {
 		return nil, false
 	}
+
 	v := s.values[len(s.values)-1]
+
 	return v, true
 }
 
@@ -79,6 +87,7 @@ func (s *stack) clone() *stack {
 		values: make([]interface{}, s.len()),
 	}
 	copy(d.values, s.values)
+
 	return &d
 }
 

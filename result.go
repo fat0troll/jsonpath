@@ -23,6 +23,7 @@ type Result struct {
 func (r *Result) Pretty(showPath bool) string {
 	b := bytes.NewBufferString("")
 	printed := false
+
 	if showPath {
 		for _, k := range r.Keys {
 			switch v := k.(type) {
@@ -32,6 +33,7 @@ func (r *Result) Pretty(showPath bool) string {
 				b.WriteString(fmt.Sprintf("%q", v))
 			}
 			b.WriteRune('\t')
+
 			printed = true
 		}
 	} else if r.Value == nil {
@@ -48,10 +50,13 @@ func (r *Result) Pretty(showPath bool) string {
 
 	if r.Value != nil {
 		printed = true
+
 		b.WriteString(fmt.Sprintf("%s", r.Value))
 	}
+
 	if printed {
 		b.WriteRune('\n')
 	}
+
 	return b.String()
 }

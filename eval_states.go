@@ -131,6 +131,7 @@ func evalArrayAfterOpen(e *Eval, i *Item) evalStateFn {
 	default:
 		e.Error = errors.New(UnexpectedToken)
 	}
+
 	return nil
 }
 
@@ -152,6 +153,7 @@ func evalArrayValue(e *Eval, i *Item) evalStateFn {
 	default:
 		e.Error = errors.New(UnexpectedToken)
 	}
+
 	return nil
 }
 
@@ -163,21 +165,25 @@ func evalArrayAfterValue(e *Eval, i *Item) evalStateFn {
 				e.prevIndex = valIndex
 			}
 		}
+
 		return evalArrayValue
 	case jsonBracketRight:
 		e.location.pop()
 		setPrevIndex(e)
+
 		return rightBraceOrBracket(e)
 	case jsonError:
 		return evalError(e, i)
 	default:
 		e.Error = errors.New(UnexpectedToken)
 	}
+
 	return nil
 }
 
 func setPrevIndex(e *Eval) {
 	e.prevIndex = -1
+
 	peeked, ok := e.location.peek()
 	if ok {
 		if peekedIndex, intOk := peeked.(int); intOk {
@@ -194,6 +200,7 @@ func evalRootEnd(e *Eval, i *Item) evalStateFn {
 			e.Error = errors.New(BadStructure)
 		}
 	}
+
 	return nil
 }
 

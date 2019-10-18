@@ -14,6 +14,7 @@ import (
 func testLexerMethods(l lexer, as *assert.Assertions) {
 	s := l.peek()
 	as.EqualValues('{', s, "First rune should match")
+
 	r := l.take()
 	as.EqualValues('{', r, "First rune should match")
 	r = l.take()
@@ -114,6 +115,7 @@ func TestReaderLexerReset(t *testing.T) {
 
 	lexer.reset()
 	reader.Seek(0, 0)
+
 	ritems2 := readerToArray(lexer)
 
 	as.EqualValues(ritems, ritems2, "Item slices are not equal")
@@ -133,6 +135,7 @@ func TestLexersAgainstEachOther(t *testing.T) {
 
 func TestLargeJSON(t *testing.T) {
 	as := assert.New(t)
+
 	input, err := ioutil.ReadFile("large.test")
 	if err != nil {
 		t.SkipNow()
@@ -140,12 +143,16 @@ func TestLargeJSON(t *testing.T) {
 	}
 
 	lexer := NewSliceLexer(input, JSON)
+
 	for {
 		i, ok := lexer.next()
+
 		if i.typ == jsonError {
 			as.Fail(string(i.val))
 		}
+
 		_ = i
+
 		if !ok {
 			break
 		}
@@ -154,7 +161,9 @@ func TestLargeJSON(t *testing.T) {
 
 func benchmarkBytesLexer(input []byte, b *testing.B) {
 	lexer := NewSliceLexer(input, JSON)
+
 	b.ResetTimer()
+
 	for n := 0; n < b.N; n++ {
 		for {
 			_, ok := lexer.next()
@@ -169,7 +178,9 @@ func benchmarkBytesLexer(input []byte, b *testing.B) {
 func benchmarkReaderLexer(input []byte, b *testing.B) {
 	reader := bytes.NewReader(input)
 	lexer := NewReaderLexer(reader, JSON)
+
 	b.ResetTimer()
+
 	for n := 0; n < b.N; n++ {
 		for {
 			_, ok := lexer.next()
@@ -185,9 +196,12 @@ func benchmarkReaderLexer(input []byte, b *testing.B) {
 func benchmarkStdLibDecode(input []byte, b *testing.B) {
 	reader := bytes.NewReader(input)
 	dec := json.NewDecoder(reader)
+
 	b.ResetTimer()
+
 	for n := 0; n < b.N; n++ {
 		var x struct{}
+
 		dec.Decode(&x)
 		reader.Seek(0, 0)
 	}
@@ -196,8 +210,10 @@ func benchmarkStdLibDecode(input []byte, b *testing.B) {
 // Not comparable to previous benchmarks
 func benchmarkStdUnmarshal(input []byte, b *testing.B) {
 	b.ResetTimer()
+
 	for n := 0; n < b.N; n++ {
 		var x interface{}
+
 		err := json.Unmarshal(input, &x)
 		if err != nil {
 			b.Error(err)
@@ -210,19 +226,24 @@ func BenchmarkStdUnmarshalLarge(b *testing.B) {
 	if err != nil {
 		b.SkipNow()
 	}
+
 	benchmarkStdUnmarshal(input, b)
 }
 
 func BenchmarkStdLibDecodeLarge(b *testing.B) {
 	input, err := ioutil.ReadFile("large.test")
-	reader := bytes.NewReader(input)
 	if err != nil {
 		b.SkipNow()
 	}
+
+	reader := bytes.NewReader(input)
 	dec := json.NewDecoder(reader)
+
 	b.ResetTimer()
+
 	for n := 0; n < b.N; n++ {
 		var x struct{}
+
 		dec.Decode(&x)
 		reader.Seek(0, 0)
 	}
@@ -233,6 +254,7 @@ func BenchmarkSliceLexerLarge(b *testing.B) {
 	if err != nil {
 		b.SkipNow()
 	}
+
 	benchmarkBytesLexer(input, b)
 }
 
@@ -244,7 +266,9 @@ func BenchmarkReaderLexerLarge(b *testing.B) {
 	// reader := io.NewReader(input)
 	// reader, _ := os.Open("large.test")
 	lexer := NewReaderLexer(input, JSON)
+
 	b.ResetTimer()
+
 	for n := 0; n < b.N; n++ {
 		for {
 			_, ok := lexer.next()

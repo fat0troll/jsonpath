@@ -56,5 +56,6 @@ func typesDescription(types []int, nameMap map[int]string) []string {
 	for i, val := range types {
 		vals[i] = nameMap[val]
 	}
+
 	return vals
 }

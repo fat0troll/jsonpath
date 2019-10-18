@@ -10,7 +10,9 @@ func takeExponent(l lexer) error {
 	if r != 'e' && r != 'E' {
 		return nil
 	}
+
 	l.take()
+
 	r = l.take()
 	switch r {
 	case '+', '-':
@@ -18,12 +20,14 @@ func takeExponent(l lexer) error {
 		if d := l.peek(); !(d >= '0' && d <= '9') {
 			return fmt.Errorf("expected digit after numeric sign instead of %#U", d)
 		}
+
 		takeDigits(l)
 	case '0', '1', '2', '3', '4', '5', '6', '7', '8', '9':
 		takeDigits(l)
 	default:
 		return fmt.Errorf("expected digit after 'e' instead of %#U", r)
 	}
+
 	return nil
 }
 
@@ -35,6 +39,7 @@ func takeJSONNumeric(l lexer) error {
 		if d := l.peek(); !(d >= '0' && d <= '9') {
 			return fmt.Errorf("expected digit after dash instead of %#U", d)
 		}
+
 		takeDigits(l)
 	case '0', '1', '2', '3', '4', '5', '6', '7', '8', '9':
 		takeDigits(l)
@@ -51,7 +56,9 @@ func takeJSONNumeric(l lexer) error {
 		if d := l.peek(); !(d >= '0' && d <= '9') {
 			return fmt.Errorf("expected digit after '.' instead of %#U", d)
 		}
+
 		takeDigits(l)
+
 		if err := takeExponent(l); err != nil {
 			return err
 		}
@@ -96,22 +103,27 @@ func takeExactSequence(l lexer, str []byte) bool {
 			return false
 		}
 	}
+
 	return true
 }
 
 func readerToArray(tr tokenReader) []Item {
 	vals := make([]Item, 0)
+
 	for {
 		i, ok := tr.next()
 		if !ok {
 			break
 		}
+
 		v := *i
 		s := make([]byte, len(v.val))
 		copy(s, v.val)
+
 		v.val = s
 		vals = append(vals, v)
 	}
+
 	return vals
 }
 
@@ -121,6 +133,7 @@ func findErrors(items []Item) (Item, bool) {
 			return i, true
 		}
 	}
+
 	return Item{}, false
 }
 
@@ -144,6 +157,7 @@ func firstError(errors ...error) error {
 			return e
 		}
 	}
+
 	return nil
 }
 
@@ -154,6 +168,7 @@ func abs(x int) int {
 	case x == 0:
 		return 0 // return correctly abs(-0)
 	}
+
 	return x
 }
 

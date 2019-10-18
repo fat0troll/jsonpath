@@ -63,6 +63,7 @@ func itemsToTypes(items []Item) []int {
 	for i, item := range items {
 		types[i] = item.typ
 	}
+
 	return types
 }
 
@@ -161,6 +162,7 @@ var examples = []string{
 
 func TestMixedCaseJSON(t *testing.T) {
 	as := assert.New(t)
+
 	for _, json := range examples {
 		lexer := NewSliceLexer([]byte(json), JSON)
 		items := readerToArray(lexer)

@@ -24,6 +24,7 @@ var expressionTests = []lexTest{
 
 func TestExpressionTokens(t *testing.T) {
 	as := assert.New(t)
+
 	for _, test := range expressionTests {
 		lexer := NewSliceLexer([]byte(test.input), EXPRESSION)
 		items := readerToArray(lexer)
