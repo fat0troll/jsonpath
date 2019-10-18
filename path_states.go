@@ -118,6 +118,7 @@ func lexPathBracketOpen(l lexer, state *intStack) stateFn {
 
 		return lexPathBracketClose
 	case '"':
+		// nolint:errcheck
 		l.takeString()
 		l.emit(pathKey)
 
@@ -155,6 +156,7 @@ func lexKey(l lexer, state *intStack) stateFn {
 
 		return lexPathAfterKey
 	case '"':
+		// nolint:errcheck
 		l.takeString()
 		l.emit(pathKey)
 
