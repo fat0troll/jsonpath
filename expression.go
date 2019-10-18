@@ -16,7 +16,6 @@ const (
 	exprErrorValueNotFound      = "Value for %q not found"
 	exprErrorBadValue           = "Bad value %q for type %q"
 	exprErrorPathValueNotScalar = "Path value must be scalar value"
-	exprErrorBadOperandType     = "Operand type expected to be %q for operation %q"
 )
 
 type exprErrorBadTypeComparison struct {

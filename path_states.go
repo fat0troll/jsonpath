@@ -194,15 +194,6 @@ func lexPathIndexRangeSecond(l lexer, state *intStack) stateFn {
 	}
 }
 
-func lexPathArrayClose(l lexer, state *intStack) stateFn {
-	cur := l.take()
-	if cur != ']' {
-		return l.errorf("Expected ] instead of  %#U", cur)
-	}
-	l.emit(pathBracketRight)
-	return lexPathAfterKey
-}
-
 func lexPathAfterValue(l lexer, state *intStack) stateFn {
 	cur := l.take()
 	if cur != eof {

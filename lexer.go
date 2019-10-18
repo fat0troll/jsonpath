@@ -33,6 +33,7 @@ type lexer interface {
 	reset()
 }
 
+// nolint:structcheck
 type lex struct {
 	initialState   stateFn
 	currentStateFn stateFn
@@ -48,33 +49,6 @@ func newLex(initial stateFn) lex {
 		item:           Item{},
 		stack:          *newIntStack(),
 	}
-}
-
-func (i *Item) clone() *Item {
-	ic := Item{
-		typ: i.typ,
-		pos: i.pos,
-		val: make([]byte, len(i.val)),
-	}
-	copy(ic.val, i.val)
-	return &ic
-}
-
-func itemsDescription(items []Item, nameMap map[int]string) []string {
-	vals := make([]string, len(items))
-	for i, item := range items {
-		vals[i] = itemDescription(&item, nameMap)
-	}
-	return vals
-}
-
-func itemDescription(item *Item, nameMap map[int]string) string {
-	var found bool
-	val, found := nameMap[item.typ]
-	if !found {
-		return string(item.val)
-	}
-	return val
 }
 
 func typesDescription(types []int, nameMap map[int]string) []string {

@@ -27,13 +27,14 @@ var optests = []optest{
 func TestQueryOperators(t *testing.T) {
 	as := assert.New(t)
 
-	for _, t := range optests {
-		path, err := parsePath(t.path)
+	for _, optest := range optests {
+		t.Log(optest.name)
+		path, err := parsePath(optest.path)
 		as.NoError(err)
 
-		as.EqualValues(len(t.expected), len(path.operators))
+		as.EqualValues(len(optest.expected), len(path.operators))
 
-		for x, op := range t.expected {
+		for x, op := range optest.expected {
 			as.EqualValues(pathTokenNames[op], pathTokenNames[path.operators[x].typ])
 		}
 	}

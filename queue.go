@@ -15,7 +15,7 @@ func newResults() *Results {
 
 func (q *Results) push(n *Result) {
 	if q.head == q.tail && q.count > 0 {
-		nodes := make([]*Result, len(q.nodes)*2, len(q.nodes)*2)
+		nodes := make([]*Result, len(q.nodes)*2)
 		copy(nodes, q.nodes[q.head:])
 		copy(nodes[len(q.nodes)-q.head:], q.nodes[:q.head])
 		q.head = 0
@@ -37,7 +37,7 @@ func (q *Results) Pop() *Result {
 	return node
 }
 
-func (q *Results) peek() *Result {
+func (q *Results) Peek() *Result {
 	if q.count == 0 {
 		return nil
 	}

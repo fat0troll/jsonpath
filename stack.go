@@ -37,67 +37,6 @@ func (s *intStack) peek() (int, bool) {
 	return v, true
 }
 
-func (s *intStack) clone() *intStack {
-	d := intStack{
-		values: make([]int, s.len()),
-	}
-	copy(d.values, s.values)
-	return &d
-}
-
-func (s *intStack) toArray() []int {
-	return s.values
-}
-
-// Result Stack
-
-type resultStack struct {
-	values []Result
-}
-
-func newResultStack() *resultStack {
-	return &resultStack{
-		values: make([]Result, 0),
-	}
-}
-
-func (s *resultStack) len() int {
-	return len(s.values)
-}
-
-func (s *resultStack) push(r Result) {
-	s.values = append(s.values, r)
-}
-
-func (s *resultStack) pop() (Result, bool) {
-	if s.len() == 0 {
-		return Result{}, false
-	}
-	v, _ := s.peek()
-	s.values = s.values[:len(s.values)-1]
-	return v, true
-}
-
-func (s *resultStack) peek() (Result, bool) {
-	if s.len() == 0 {
-		return Result{}, false
-	}
-	v := s.values[len(s.values)-1]
-	return v, true
-}
-
-func (s *resultStack) clone() *resultStack {
-	d := resultStack{
-		values: make([]Result, s.len()),
-	}
-	copy(d.values, s.values)
-	return &d
-}
-
-func (s *resultStack) toArray() []Result {
-	return s.values
-}
-
 // Interface Stack
 
 type stack struct {

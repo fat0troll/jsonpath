@@ -11,7 +11,6 @@ const (
 	exprNull
 	exprString
 
-	exprOperators
 	exprOpEq
 	exprOpNeq
 	exprOpNot
@@ -251,7 +250,7 @@ func takeNumeric(l lexer) {
 
 func takePath(l lexer) {
 	inQuotes := false
-	var prev int = 0
+	prev := 0
 	// capture until end of path - ugly
 takeLoop:
 	for {
@@ -275,13 +274,4 @@ takeLoop:
 
 		prev = cur
 	}
-}
-
-func lexExprEnd(l lexer, state *intStack) stateFn {
-	cur := l.take()
-	if cur != eof {
-		return l.errorf("Expected EOF but received %#U", cur)
-	}
-	l.emit(exprEOF)
-	return nil
 }

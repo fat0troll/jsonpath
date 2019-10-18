@@ -198,8 +198,8 @@ func pathMatchOp(q *query, e *Eval, i *Item) queryStateFn {
 			if len(q.operators)+q.start >= curLocation {
 				current, _ := e.location.peek()
 				nextOp := q.operators[abs(q.loc()-q.start)]
-				if itemMatchOperator(current, i, nextOp) {
-					q.pos += 1
+				if itemMatchOperator(current, nextOp) {
+					q.pos++
 
 					if nextOp.whereClauseBytes != nil && len(nextOp.whereClause) > 0 {
 						bucket := exprBucket{
@@ -312,7 +312,7 @@ func (b *exprBucket) evaluate() (bool, error) {
 	return res_bool, nil
 }
 
-func itemMatchOperator(loc interface{}, i *Item, op *operator) bool {
+func itemMatchOperator(loc interface{}, op *operator) bool {
 	topBytes, isKey := loc.([]byte)
 	topInt, isIndex := loc.(int)
 	if isKey {
