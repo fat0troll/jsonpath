@@ -33,7 +33,7 @@ func TestValidJson(t *testing.T) {
 	}
 }
 
-var errorJsonTests = []lexTest{
+var errorJSONTests = []lexTest{
 	{"Missing end brace", `{`, []int{jsonBraceLeft, jsonError}},
 	{"Missing start brace", `}`, []int{jsonError}},
 	{"Missing key start quote", `{key":true}`, []int{jsonBraceLeft, jsonError}},
@@ -50,7 +50,7 @@ var errorJsonTests = []lexTest{
 func TestMalformedJson(t *testing.T) {
 	as := assert.New(t)
 
-	for _, test := range errorJsonTests {
+	for _, test := range errorJSONTests {
 		lexer := NewSliceLexer([]byte(test.input), JSON)
 		types := itemsToTypes(readerToArray(lexer))
 

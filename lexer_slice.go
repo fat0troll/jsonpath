@@ -34,14 +34,14 @@ func (l *SliceLexer) takeString() error {
 	inputLen := len(l.input)
 
 	if int(curPos) >= inputLen {
-		return errors.New("End of file where string expected")
+		return errors.New("end of file where string expected")
 	}
 
 	cur := int(l.input[curPos])
 	curPos++
 	if cur != '"' {
 		l.pos = curPos
-		return fmt.Errorf("Expected \" as start of string instead of %#U", cur)
+		return fmt.Errorf("expected \" as start of string instead of %#U", cur)
 	}
 
 	var previous int
@@ -49,7 +49,7 @@ looper:
 	for {
 		if int(curPos) >= inputLen {
 			l.pos = curPos
-			return errors.New("End of file where string expected")
+			return errors.New("end of file where string expected")
 		}
 		cur := int(l.input[curPos])
 		curPos++

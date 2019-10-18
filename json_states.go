@@ -38,12 +38,14 @@ var jsonTokenNames = map[int]string{
 	jsonBool:         "BOOL",
 }
 
-var JSON = lexJsonRoot
+var JSON = lexJSONRoot
 
-func lexJsonRoot(l lexer, state *intStack) stateFn {
+func lexJSONRoot(l lexer, state *intStack) stateFn {
 	ignoreSpaceRun(l)
 	cur := l.peek()
+
 	var next stateFn
+
 	switch cur {
 	case '{':
 		next = stateJSONObjectOpen

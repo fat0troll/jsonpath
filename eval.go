@@ -259,17 +259,17 @@ func pathEndValue(q *query, e *Eval, i *Item) queryStateFn {
 
 			switch q.firstType {
 			case jsonBraceLeft:
-				r.Type = JsonObject
+				r.Type = JSONObject
 			case jsonString:
-				r.Type = JsonString
+				r.Type = JSONString
 			case jsonBracketLeft:
-				r.Type = JsonArray
+				r.Type = JSONArray
 			case jsonNull:
-				r.Type = JsonNull
+				r.Type = JSONNull
 			case jsonBool:
-				r.Type = JsonBool
+				r.Type = JSONBool
 			case jsonNumber:
-				r.Type = JsonNumber
+				r.Type = JSONNumber
 			default:
 				r.Type = -1
 			}
@@ -297,7 +297,7 @@ func (b *exprBucket) evaluate() (bool, error) {
 	for _, q := range b.queries {
 		result := q.resultQueue.Pop()
 		if result != nil {
-			t, err := getJsonTokenType(result.Value)
+			t, err := getJSONTokenType(result.Value)
 			if err != nil {
 				return false, err
 			}

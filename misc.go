@@ -16,13 +16,13 @@ func takeExponent(l lexer) error {
 	case '+', '-':
 		// Check digit immediately follows sign
 		if d := l.peek(); !(d >= '0' && d <= '9') {
-			return fmt.Errorf("Expected digit after numeric sign instead of %#U", d)
+			return fmt.Errorf("expected digit after numeric sign instead of %#U", d)
 		}
 		takeDigits(l)
 	case '0', '1', '2', '3', '4', '5', '6', '7', '8', '9':
 		takeDigits(l)
 	default:
-		return fmt.Errorf("Expected digit after 'e' instead of %#U", r)
+		return fmt.Errorf("expected digit after 'e' instead of %#U", r)
 	}
 	return nil
 }
@@ -33,13 +33,13 @@ func takeJSONNumeric(l lexer) error {
 	case '-':
 		// Check digit immediately follows sign
 		if d := l.peek(); !(d >= '0' && d <= '9') {
-			return fmt.Errorf("Expected digit after dash instead of %#U", d)
+			return fmt.Errorf("expected digit after dash instead of %#U", d)
 		}
 		takeDigits(l)
 	case '0', '1', '2', '3', '4', '5', '6', '7', '8', '9':
 		takeDigits(l)
 	default:
-		return fmt.Errorf("Expected digit or dash instead of %#U", cur)
+		return fmt.Errorf("expected digit or dash instead of %#U", cur)
 	}
 
 	// fraction or exponent
@@ -49,7 +49,7 @@ func takeJSONNumeric(l lexer) error {
 		l.take()
 		// Check digit immediately follows period
 		if d := l.peek(); !(d >= '0' && d <= '9') {
-			return fmt.Errorf("Expected digit after '.' instead of %#U", d)
+			return fmt.Errorf("expected digit after '.' instead of %#U", d)
 		}
 		takeDigits(l)
 		if err := takeExponent(l); err != nil {
@@ -158,10 +158,11 @@ func abs(x int) int {
 }
 
 //TODO: Kill the need for this
-func getJsonTokenType(val []byte) (int, error) {
+func getJSONTokenType(val []byte) (int, error) {
 	if len(val) == 0 {
-		return -1, errors.New("No Value")
+		return -1, errors.New("no value")
 	}
+
 	switch val[0] {
 	case '{':
 		return jsonBraceLeft, nil
@@ -176,6 +177,6 @@ func getJsonTokenType(val []byte) (int, error) {
 	case '-', '+', '0', '1', '2', '3', '4', '5', '6', '7', '8', '9':
 		return jsonNumber, nil
 	default:
-		return -1, errors.New("Unrecognized Json Value")
+		return -1, errors.New("unrecognized JSON value")
 	}
 }

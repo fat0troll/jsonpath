@@ -6,12 +6,12 @@ import (
 )
 
 const (
-	JsonObject = iota
-	JsonArray
-	JsonString
-	JsonNumber
-	JsonNull
-	JsonBool
+	JSONObject = iota
+	JSONArray
+	JSONString
+	JSONNumber
+	JSONNull
+	JSONBool
 )
 
 type Result struct {

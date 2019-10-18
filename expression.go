@@ -64,11 +64,11 @@ func infixToPostFix(items []Item) (out []Item, err error) {
 			found := false
 			for {
 				// pop item ("(" or operator) from stack
-				op_interface, ok := stack.pop()
+				opInterface, ok := stack.pop()
 				if !ok {
 					return nil, errors.New(exprErrorMismatchedParens)
 				}
-				op := op_interface.(Item)
+				op := opInterface.(Item)
 				if op.typ == exprParenLeft {
 					found = true
 					break // discard "("
@@ -83,8 +83,8 @@ func infixToPostFix(items []Item) (out []Item, err error) {
 				// token is an operator
 				for stack.len() > 0 {
 					// consider top item on stack
-					op_int, _ := stack.peek()
-					op := op_int.(Item)
+					opInt, _ := stack.peek()
+					op := opInt.(Item)
 					if o2, isOp := opa[op.typ]; !isOp || o1.prec > o2.prec ||
 						o1.prec == o2.prec && o1.rAssoc {
 						break
@@ -102,8 +102,8 @@ func infixToPostFix(items []Item) (out []Item, err error) {
 	}
 	// drain stack to result
 	for stack.len() > 0 {
-		op_int, _ := stack.pop()
-		op := op_int.(Item)
+		opInt, _ := stack.pop()
+		op := opInt.(Item)
 		if op.typ == exprParenLeft {
 			return nil, errors.New(exprErrorMismatchedParens)
 		}
@@ -308,7 +308,7 @@ func evaluatePostFix(postFixItems []Item, pathValues map[string]Item) (interface
 			}
 
 			if a == 0.0 {
-				return false, errors.New("Cannot divide by zero")
+				return false, errors.New("cannot divide by zero")
 			}
 			s.push(b / a)
 		case exprOpStar:
@@ -340,15 +340,16 @@ func evaluatePostFix(postFixItems []Item, pathValues map[string]Item) (interface
 			s.push(!a)
 		// Other
 		default:
-			return false, fmt.Errorf("Token not supported in evaluator: %v", exprTokenNames[item.typ])
+			return false, fmt.Errorf("token not supported in evaluator: %v", exprTokenNames[item.typ])
 		}
 	}
 
 	if s.len() != 1 {
 		return false, fmt.Errorf(exprErrorBadExpression)
 	}
-	end_int, _ := s.pop()
-	return end_int, nil
+
+	endInt, _ := s.pop()
+	return endInt, nil
 }
 
 func take1Bool(s *stack, op int) (bool, error) {

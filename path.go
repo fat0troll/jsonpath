@@ -36,10 +36,13 @@ type operator struct {
 // nolint:gocognit
 func genIndexKey(tr tokenReader) (*operator, error) {
 	k := &operator{}
+
 	var t *Item
+
 	var ok bool
+
 	if t, ok = tr.next(); !ok {
-		return nil, errors.New("Expected number, key, or *, but got none")
+		return nil, errors.New("expected number, key, or *, but got none")
 	}
 
 	switch t.typ {
@@ -47,22 +50,23 @@ func genIndexKey(tr tokenReader) (*operator, error) {
 		k.typ = opTypeIndexWild
 		k.indexStart = 0
 		if t, ok = tr.next(); !ok {
-			return nil, errors.New("Expected ] after *, but got none")
+			return nil, errors.New("expected ] after *, but got none")
 		}
 		if t.typ != pathBracketRight {
-			return nil, fmt.Errorf("Expected ] after * instead of %q", t.val)
+			return nil, fmt.Errorf("expected ] after * instead of %q", t.val)
 		}
 	case pathIndex:
 		v, err := strconv.Atoi(string(t.val))
 		if err != nil {
-			return nil, fmt.Errorf("Could not parse %q into int64", t.val)
+			return nil, fmt.Errorf("could not parse %q into int64", t.val)
 		}
+
 		k.indexStart = v
 		k.indexEnd = v
 		k.hasIndexEnd = true
 
 		if t, ok = tr.next(); !ok {
-			return nil, errors.New("Expected number or *, but got none")
+			return nil, errors.New("expected number or *, but got none")
 		}
 
 		switch t.typ {
@@ -77,6 +81,7 @@ func genIndexKey(tr tokenReader) (*operator, error) {
 				if err != nil {
 					return nil, fmt.Errorf("could not parse %q into int64", t.val)
 				}
+
 				k.indexEnd = v - 1
 				k.hasIndexEnd = true
 
@@ -113,6 +118,7 @@ func genIndexKey(tr tokenReader) (*operator, error) {
 
 func parsePath(pathString string) (*Path, error) {
 	lexer := NewSliceLexer([]byte(pathString), PATH)
+
 	p, err := tokensToOperators(lexer)
 	if err != nil {
 		return nil, err
@@ -124,9 +130,11 @@ func parsePath(pathString string) (*Path, error) {
 	for _, op := range p.operators {
 		if len(op.whereClauseBytes) > 0 {
 			var err error
+
 			trimmed := op.whereClauseBytes[1 : len(op.whereClauseBytes)-1]
 			whereLexer := NewSliceLexer(trimmed, EXPRESSION)
 			items := readerToArray(whereLexer)
+
 			if errItem, found := findErrors(items); found {
 				return nil, errors.New(string(errItem.val))
 			}
@@ -136,6 +144,7 @@ func parsePath(pathString string) (*Path, error) {
 			if err != nil {
 				return nil, err
 			}
+
 			op.dependentPaths = make([]*Path, 0)
 			// parse all paths in expression
 			for _, item := range op.whereClause {
@@ -144,11 +153,13 @@ func parsePath(pathString string) (*Path, error) {
 					if err != nil {
 						return nil, err
 					}
+
 					op.dependentPaths = append(op.dependentPaths, p)
 				}
 			}
 		}
 	}
+
 	return p, nil
 }
 
@@ -158,27 +169,28 @@ func tokensToOperators(tr tokenReader) (*Path, error) {
 		captureEndValue: false,
 		operators:       make([]*operator, 0),
 	}
+
 	for {
 		p, ok := tr.next()
 		if !ok {
 			break
 		}
+
 		switch p.typ {
 		case pathRoot:
 			if len(q.operators) != 0 {
-				return nil, errors.New("Unexpected root node after start")
+				return nil, errors.New("unexpected root node after start")
 			}
-			continue
 
+			continue
 		case pathCurrent:
 			if len(q.operators) != 0 {
-				return nil, errors.New("Unexpected current node after start")
+				return nil, errors.New("unexpected current node after start")
 			}
-			continue
 
+			continue
 		case pathPeriod:
 			continue
-
 		case pathBracketLeft:
 			k, err := genIndexKey(tr)
 			if err != nil {
@@ -190,11 +202,13 @@ func tokensToOperators(tr tokenReader) (*Path, error) {
 			keyName := p.val
 
 			if len(p.val) == 0 {
-				return nil, fmt.Errorf("Key length is zero at %d", p.pos)
+				return nil, fmt.Errorf("key length is zero at %d", p.pos)
 			}
+
 			if p.val[0] == '"' && p.val[len(p.val)-1] == '"' {
 				keyName = p.val[1 : len(p.val)-1]
 			}
+
 			q.operators = append(
 				q.operators,
 				&operator{
@@ -204,28 +218,28 @@ func tokensToOperators(tr tokenReader) (*Path, error) {
 					},
 				},
 			)
-
 		case pathWildcard:
 			q.operators = append(q.operators, &operator{typ: opTypeNameWild})
 
 		case pathValue:
 			q.captureEndValue = true
-
 		case pathWhere:
 
 		case pathExpression:
 			if len(q.operators) == 0 {
-				return nil, errors.New("Cannot add where clause on last key")
+				return nil, errors.New("cannot add where clause on last key")
 			}
+
 			last := q.operators[len(q.operators)-1]
 			if last.whereClauseBytes != nil {
-				return nil, errors.New("Expression on last key already set")
+				return nil, errors.New("expression on last key already set")
 			}
-			last.whereClauseBytes = p.val
 
+			last.whereClauseBytes = p.val
 		case pathError:
 			return q, errors.New(string(p.val))
 		}
 	}
+
 	return q, nil
 }
