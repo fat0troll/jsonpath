@@ -1,0 +1,24 @@
+kind: pipeline
+type: docker
+name: build
+
+steps:
+  - name: lint
+    image: golangci/golangci-lint:latest
+    environment:
+      CGO_ENABLED: 0
+    commands:
+      - golangci-lint run
+  - name: test-1.13
+    image: golang:1.13.1-alpine
+    environment:
+      CGO_ENABLED: 0
+    commands:
+      - go test -cover -test.v .
+  - name: test-1.12
+    image: golang:1.12.10-alpine
+    environment:
+      CGO_ENABLED: 0
+      GO111MODULE: on
+    commands:
+      - go test -cover -test.v .
