@@ -16,7 +16,7 @@ steps:
     commands:
       - go test -cover -test.v .
   - name: test-1.12
-    image: golang:1.12.10-alpine
+    image: golang:1.12.10
     environment:
       CGO_ENABLED: 0
       GO111MODULE: on
