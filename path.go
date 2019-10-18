@@ -33,6 +33,7 @@ type operator struct {
 	whereClause      []Item
 }
 
+// nolint:gocognit
 func genIndexKey(tr tokenReader) (*operator, error) {
 	k := &operator{}
 	var t *Item
@@ -63,34 +64,36 @@ func genIndexKey(tr tokenReader) (*operator, error) {
 		if t, ok = tr.next(); !ok {
 			return nil, errors.New("Expected number or *, but got none")
 		}
+
 		switch t.typ {
 		case pathIndexRange:
 			if t, ok = tr.next(); !ok {
-				return nil, errors.New("Expected number or *, but got none")
+				return nil, errors.New("expected number or *, but got none")
 			}
+
 			switch t.typ {
 			case pathIndex:
 				v, err := strconv.Atoi(string(t.val))
 				if err != nil {
-					return nil, fmt.Errorf("Could not parse %q into int64", t.val)
+					return nil, fmt.Errorf("could not parse %q into int64", t.val)
 				}
 				k.indexEnd = v - 1
 				k.hasIndexEnd = true
 
 				if t, ok = tr.next(); !ok || t.typ != pathBracketRight {
-					return nil, errors.New("Expected ], but got none")
+					return nil, errors.New("expected ], but got none")
 				}
 			case pathBracketRight:
 				k.hasIndexEnd = false
 			default:
-				return nil, fmt.Errorf("Unexpected value within brackets after index: %q", t.val)
+				return nil, fmt.Errorf("unexpected value within brackets after index: %q", t.val)
 			}
 
 			k.typ = opTypeIndexRange
 		case pathBracketRight:
 			k.typ = opTypeIndex
 		default:
-			return nil, fmt.Errorf("Unexpected value within brackets after index: %q", t.val)
+			return nil, fmt.Errorf("unexpected value within brackets after index: %q", t.val)
 		}
 	case pathKey:
 		k.keyStrings = map[string]struct{}{
@@ -99,10 +102,10 @@ func genIndexKey(tr tokenReader) (*operator, error) {
 		k.typ = opTypeName
 
 		if t, ok = tr.next(); !ok || t.typ != pathBracketRight {
-			return nil, errors.New("Expected ], but got none")
+			return nil, errors.New("expected ], but got none")
 		}
 	default:
-		return nil, fmt.Errorf("Unexpected value within brackets: %q", t.val)
+		return nil, fmt.Errorf("unexpected value within brackets: %q", t.val)
 	}
 
 	return k, nil
@@ -166,21 +169,26 @@ func tokensToOperators(tr tokenReader) (*Path, error) {
 				return nil, errors.New("Unexpected root node after start")
 			}
 			continue
+
 		case pathCurrent:
 			if len(q.operators) != 0 {
 				return nil, errors.New("Unexpected current node after start")
 			}
 			continue
+
 		case pathPeriod:
 			continue
+
 		case pathBracketLeft:
 			k, err := genIndexKey(tr)
 			if err != nil {
 				return nil, err
 			}
 			q.operators = append(q.operators, k)
+
 		case pathKey:
 			keyName := p.val
+
 			if len(p.val) == 0 {
 				return nil, fmt.Errorf("Key length is zero at %d", p.pos)
 			}
@@ -196,11 +204,15 @@ func tokensToOperators(tr tokenReader) (*Path, error) {
 					},
 				},
 			)
+
 		case pathWildcard:
 			q.operators = append(q.operators, &operator{typ: opTypeNameWild})
+
 		case pathValue:
 			q.captureEndValue = true
+
 		case pathWhere:
+
 		case pathExpression:
 			if len(q.operators) == 0 {
 				return nil, errors.New("Cannot add where clause on last key")
@@ -210,6 +222,7 @@ func tokensToOperators(tr tokenReader) (*Path, error) {
 				return nil, errors.New("Expression on last key already set")
 			}
 			last.whereClauseBytes = p.val
+
 		case pathError:
 			return q, errors.New(string(p.val))
 		}

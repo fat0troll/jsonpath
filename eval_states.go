@@ -18,6 +18,7 @@ func evalRoot(e *Eval, i *Item) evalStateFn {
 	default:
 		e.Error = errors.New(UnexpectedToken)
 	}
+
 	return nil
 }
 
@@ -25,12 +26,16 @@ func evalObjectAfterOpen(e *Eval, i *Item) evalStateFn {
 	switch i.typ {
 	case jsonKey:
 		c := i.val[1 : len(i.val)-1]
+
 		if e.copyValues {
 			d := make([]byte, len(c))
 			copy(d, c)
+
 			c = d
 		}
+
 		e.nextKey = c
+
 		return evalObjectColon
 	case jsonBraceRight:
 		return rightBraceOrBracket(e)
@@ -39,6 +44,7 @@ func evalObjectAfterOpen(e *Eval, i *Item) evalStateFn {
 	default:
 		e.Error = errors.New(UnexpectedToken)
 	}
+
 	return nil
 }
 
@@ -72,11 +78,13 @@ func evalObjectValue(e *Eval, i *Item) evalStateFn {
 	default:
 		e.Error = errors.New(UnexpectedToken)
 	}
+
 	return nil
 }
 
 func evalObjectAfterValue(e *Eval, i *Item) evalStateFn {
 	e.location.pop()
+
 	switch i.typ {
 	case jsonComma:
 		return evalObjectAfterOpen
@@ -87,6 +95,7 @@ func evalObjectAfterValue(e *Eval, i *Item) evalStateFn {
 	default:
 		e.Error = errors.New(UnexpectedToken)
 	}
+
 	return nil
 }
 
@@ -96,14 +105,15 @@ func rightBraceOrBracket(e *Eval) evalStateFn {
 	lowerTyp, ok := e.levelStack.peek()
 	if !ok {
 		return evalRootEnd
-	} else {
-		switch lowerTyp {
-		case jsonBraceLeft:
-			return evalObjectAfterValue
-		case jsonBracketLeft:
-			return evalArrayAfterValue
-		}
 	}
+
+	switch lowerTyp {
+	case jsonBraceLeft:
+		return evalObjectAfterValue
+	case jsonBracketLeft:
+		return evalArrayAfterValue
+	}
+
 	return nil
 }
 

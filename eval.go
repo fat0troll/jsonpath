@@ -49,7 +49,7 @@ func newEvaluation(tr tokenReader, paths ...*Path) *Eval {
 		location:    *newStack(),
 		levelStack:  *newIntStack(),
 		state:       evalRoot,
-		queries:     make(map[string]*query, 0),
+		queries:     make(map[string]*query),
 		prevIndex:   -1,
 		nextKey:     nil,
 		copyValues:  true, // depends on which lexer is used
@@ -61,7 +61,7 @@ func newEvaluation(tr tokenReader, paths ...*Path) *Eval {
 	}
 	// Determine whether to copy emitted item values ([]byte) from lexer
 	switch tr.(type) {
-	case *readerLexer:
+	case *ReaderLexer:
 		e.copyValues = true
 	default:
 		e.copyValues = false
@@ -100,6 +100,7 @@ func (e *Eval) Iterate() (*Results, bool) {
 	for str, query := range e.queries {
 		anyRunning = true
 		query.state = query.state(query, e, t)
+
 		if query.state == nil {
 			delete(e.queries, str)
 		}
@@ -144,8 +145,8 @@ func (e *Eval) Next() (*Result, bool) {
 		} else {
 			break
 		}
-
 	}
+
 	return nil, false
 }
 
@@ -163,9 +164,12 @@ func (q *query) trySpillOver() {
 			if err != nil {
 				q.errors = append(q.errors, err)
 			}
+
 			if exprRes {
 				next, ok := q.buckets.peek()
+
 				var spillover *Results
+
 				if !ok {
 					// fmt.Println("Spilling over into end queue")
 					spillover = q.resultQueue
@@ -174,6 +178,7 @@ func (q *query) trySpillOver() {
 					nextBucket := next.(exprBucket)
 					spillover = nextBucket.results
 				}
+
 				for {
 					v := bucket.results.Pop()
 					if v != nil {
@@ -191,7 +196,7 @@ func pathMatchOp(q *query, e *Eval, i *Item) queryStateFn {
 	curLocation := e.location.len() - 1
 
 	if q.loc() > curLocation {
-		q.pos -= 1
+		q.pos--
 		q.trySpillOver()
 	} else if q.loc() <= curLocation {
 		if q.loc() == curLocation-1 {
@@ -218,7 +223,6 @@ func pathMatchOp(q *query, e *Eval, i *Item) queryStateFn {
 						q.buckets.push(bucket)
 					}
 				}
-
 			}
 		}
 	}
@@ -228,15 +232,17 @@ func pathMatchOp(q *query, e *Eval, i *Item) queryStateFn {
 			q.firstType = i.typ
 			q.buffer.Write(i.val)
 		}
+
 		q.valLoc = *e.location.clone()
+
 		return pathEndValue
 	}
 
 	if q.loc() < -1 {
 		return nil
-	} else {
-		return pathMatchOp
 	}
+
+	return pathMatchOp
 }
 
 func pathEndValue(q *query, e *Eval, i *Item) queryStateFn {
@@ -278,14 +284,16 @@ func pathEndValue(q *query, e *Eval, i *Item) queryStateFn {
 
 		q.valLoc = *newStack()
 		q.buffer.Truncate(0)
-		q.pos -= 1
+		q.pos--
 		return pathMatchOp
 	}
+
 	return pathEndValue
 }
 
 func (b *exprBucket) evaluate() (bool, error) {
 	values := make(map[string]Item)
+
 	for _, q := range b.queries {
 		result := q.resultQueue.Pop()
 		if result != nil {
@@ -293,6 +301,7 @@ func (b *exprBucket) evaluate() (bool, error) {
 			if err != nil {
 				return false, err
 			}
+
 			i := Item{
 				typ: t,
 				val: result.Value,
@@ -305,11 +314,13 @@ func (b *exprBucket) evaluate() (bool, error) {
 	if err != nil {
 		return false, err
 	}
-	res_bool, ok := res.(bool)
+
+	resBool, ok := res.(bool)
 	if !ok {
 		return false, fmt.Errorf(exprErrorFinalValueNotBool, res)
 	}
-	return res_bool, nil
+
+	return resBool, nil
 }
 
 func itemMatchOperator(loc interface{}, op *operator) bool {

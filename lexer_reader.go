@@ -8,7 +8,7 @@ import (
 	"io"
 )
 
-type readerLexer struct {
+type ReaderLexer struct {
 	lex
 	bufInput *bufio.Reader
 	input    io.Reader
@@ -17,8 +17,8 @@ type readerLexer struct {
 	lexeme   *bytes.Buffer
 }
 
-func NewReaderLexer(rr io.Reader, initial stateFn) *readerLexer {
-	l := readerLexer{
+func NewReaderLexer(rr io.Reader, initial stateFn) *ReaderLexer {
+	l := ReaderLexer{
 		input:    rr,
 		bufInput: bufio.NewReader(rr),
 		nextByte: noValue,
@@ -28,7 +28,7 @@ func NewReaderLexer(rr io.Reader, initial stateFn) *readerLexer {
 	return &l
 }
 
-func (l *readerLexer) take() int {
+func (l *ReaderLexer) take() int {
 	if l.nextByte == noValue {
 		l.peek()
 	}
@@ -39,10 +39,10 @@ func (l *readerLexer) take() int {
 	return nr
 }
 
-func (l *readerLexer) takeString() error {
+func (l *ReaderLexer) takeString() error {
 	cur := l.take()
 	if cur != '"' {
-		return fmt.Errorf("Expected \" as start of string instead of %#U", cur)
+		return fmt.Errorf("expected \" as start of string instead of %#U", cur)
 	}
 
 	var previous byte
@@ -50,7 +50,7 @@ looper:
 	for {
 		curByte, err := l.bufInput.ReadByte()
 		if err == io.EOF {
-			return errors.New("Unexpected EOF in string")
+			return errors.New("unexpected EOF in string")
 		}
 		l.lexeme.WriteByte(curByte)
 
@@ -60,7 +60,7 @@ looper:
 			} else {
 				curByte, err = l.bufInput.ReadByte()
 				if err == io.EOF {
-					return errors.New("Unexpected EOF in string")
+					return errors.New("unexpected EOF in string")
 				}
 				l.lexeme.WriteByte(curByte)
 			}
@@ -71,7 +71,7 @@ looper:
 	return nil
 }
 
-func (l *readerLexer) peek() int {
+func (l *ReaderLexer) peek() int {
 	if l.nextByte != noValue {
 		return l.nextByte
 	}
@@ -86,7 +86,7 @@ func (l *readerLexer) peek() int {
 	return l.nextByte
 }
 
-func (l *readerLexer) emit(t int) {
+func (l *ReaderLexer) emit(t int) {
 	l.setItem(t, l.pos, l.lexeme.Bytes())
 	l.pos += Pos(l.lexeme.Len())
 	l.hasItem = true
@@ -117,18 +117,18 @@ func (l *readerLexer) emit(t int) {
 	}
 }
 
-func (l *readerLexer) setItem(typ int, pos Pos, val []byte) {
+func (l *ReaderLexer) setItem(typ int, pos Pos, val []byte) {
 	l.item.typ = typ
 	l.item.pos = pos
 	l.item.val = val
 }
 
-func (l *readerLexer) ignore() {
+func (l *ReaderLexer) ignore() {
 	l.pos += Pos(l.lexeme.Len())
 	l.lexeme.Reset()
 }
 
-func (l *readerLexer) next() (*Item, bool) {
+func (l *ReaderLexer) next() (*Item, bool) {
 	l.lexeme.Reset()
 	for {
 		if l.currentStateFn == nil {
@@ -145,14 +145,14 @@ func (l *readerLexer) next() (*Item, bool) {
 	return &l.item, false
 }
 
-func (l *readerLexer) errorf(format string, args ...interface{}) stateFn {
+func (l *ReaderLexer) errorf(format string, args ...interface{}) stateFn {
 	l.setItem(lexError, l.pos, []byte(fmt.Sprintf(format, args...)))
 	l.lexeme.Truncate(0)
 	l.hasItem = true
 	return nil
 }
 
-func (l *readerLexer) reset() {
+func (l *ReaderLexer) reset() {
 	l.bufInput.Reset(l.input)
 	l.lexeme.Reset()
 	l.nextByte = noValue

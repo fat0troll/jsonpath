@@ -9,7 +9,7 @@ type Results struct {
 
 func newResults() *Results {
 	return &Results{
-		nodes: make([]*Result, 3, 3),
+		nodes: make([]*Result, 3),
 	}
 }
 

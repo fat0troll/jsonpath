@@ -5,31 +5,31 @@ import (
 	"fmt"
 )
 
-type sliceLexer struct {
+type SliceLexer struct {
 	lex
 	input []byte // the []byte being scanned.
 	start Pos    // start position of this Item.
 	pos   Pos    // current position in the input
 }
 
-func NewSliceLexer(input []byte, initial stateFn) *sliceLexer {
-	l := &sliceLexer{
+func NewSliceLexer(input []byte, initial stateFn) *SliceLexer {
+	l := &SliceLexer{
 		lex:   newLex(initial),
 		input: input,
 	}
 	return l
 }
 
-func (l *sliceLexer) take() int {
+func (l *SliceLexer) take() int {
 	if int(l.pos) >= len(l.input) {
 		return eof
 	}
 	r := int(l.input[l.pos])
-	l.pos += 1
+	l.pos++
 	return r
 }
 
-func (l *sliceLexer) takeString() error {
+func (l *SliceLexer) takeString() error {
 	curPos := l.pos
 	inputLen := len(l.input)
 
@@ -67,14 +67,14 @@ looper:
 	return nil
 }
 
-func (l *sliceLexer) peek() int {
+func (l *SliceLexer) peek() int {
 	if int(l.pos) >= len(l.input) {
 		return eof
 	}
 	return int(l.input[l.pos])
 }
 
-func (l *sliceLexer) emit(t int) {
+func (l *SliceLexer) emit(t int) {
 	l.setItem(t, l.start, l.input[l.start:l.pos])
 	l.hasItem = true
 
@@ -91,17 +91,17 @@ func (l *sliceLexer) emit(t int) {
 	l.start = l.pos
 }
 
-func (l *sliceLexer) setItem(typ int, pos Pos, val []byte) {
+func (l *SliceLexer) setItem(typ int, pos Pos, val []byte) {
 	l.item.typ = typ
 	l.item.pos = pos
 	l.item.val = val
 }
 
-func (l *sliceLexer) ignore() {
+func (l *SliceLexer) ignore() {
 	l.start = l.pos
 }
 
-func (l *sliceLexer) next() (*Item, bool) {
+func (l *SliceLexer) next() (*Item, bool) {
 	for {
 		if l.currentStateFn == nil {
 			break
@@ -117,14 +117,14 @@ func (l *sliceLexer) next() (*Item, bool) {
 	return &l.item, false
 }
 
-func (l *sliceLexer) errorf(format string, args ...interface{}) stateFn {
+func (l *SliceLexer) errorf(format string, args ...interface{}) stateFn {
 	l.setItem(lexError, l.start, []byte(fmt.Sprintf(format, args...)))
 	l.start = l.pos
 	l.hasItem = true
 	return nil
 }
 
-func (l *sliceLexer) reset() {
+func (l *SliceLexer) reset() {
 	l.start = 0
 	l.pos = 0
 	l.lex = newLex(l.initialState)

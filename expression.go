@@ -9,13 +9,13 @@ import (
 )
 
 const (
-	exprErrorMismatchedParens   = "Mismatched parentheses"
-	exprErrorBadExpression      = "Bad Expression"
-	exprErrorFinalValueNotBool  = "Expression evaluated to a non-bool: %v"
-	exprErrorNotEnoughOperands  = "Not enough operands for operation %q"
-	exprErrorValueNotFound      = "Value for %q not found"
-	exprErrorBadValue           = "Bad value %q for type %q"
-	exprErrorPathValueNotScalar = "Path value must be scalar value"
+	exprErrorMismatchedParens   = "mismatched parentheses"
+	exprErrorBadExpression      = "bad expression"
+	exprErrorFinalValueNotBool  = "expression evaluated to a non-bool: %v"
+	exprErrorNotEnoughOperands  = "not enough operands for operation %q"
+	exprErrorValueNotFound      = "value for %q not found"
+	exprErrorBadValue           = "bad value %q for type %q"
+	exprErrorPathValueNotScalar = "path value must be scalar value"
 )
 
 type exprErrorBadTypeComparison struct {
@@ -141,15 +141,16 @@ func evaluatePostFix(postFixItems []Item, pathValues map[string]Item) (interface
 			if !ok {
 				return false, fmt.Errorf(exprErrorValueNotFound, string(item.val))
 			}
+
 			switch i.typ {
 			case jsonNull:
 				s.push(nil)
 			case jsonNumber:
-				val_float, err := strconv.ParseFloat(string(i.val), 64)
+				valFloat, err := strconv.ParseFloat(string(i.val), 64)
 				if err != nil {
 					return false, fmt.Errorf(exprErrorBadValue, string(item.val), jsonTokenNames[jsonNumber])
 				}
-				s.push(val_float)
+				s.push(valFloat)
 			case jsonKey, jsonString:
 				s.push(i.val)
 			default:
@@ -173,14 +174,15 @@ func evaluatePostFix(postFixItems []Item, pathValues map[string]Item) (interface
 			if !ok {
 				return false, fmt.Errorf(exprErrorNotEnoughOperands, exprTokenNames[item.typ])
 			}
+
 			switch p.(type) {
 			case nil:
 				err := take2Null(s, item.typ)
 				if err != nil {
 					return false, err
-				} else {
-					s.push(true)
 				}
+
+				s.push(true)
 			case bool:
 				a, b, err := take2Bool(s, item.typ)
 				if err != nil {
@@ -205,14 +207,15 @@ func evaluatePostFix(postFixItems []Item, pathValues map[string]Item) (interface
 			if !ok {
 				return false, fmt.Errorf(exprErrorNotEnoughOperands, exprTokenNames[item.typ])
 			}
+
 			switch p.(type) {
 			case nil:
 				err := take2Null(s, item.typ)
 				if err != nil {
 					return true, err
-				} else {
-					s.push(false)
 				}
+
+				s.push(false)
 			case bool:
 				a, b, err := take2Bool(s, item.typ)
 				if err != nil {
@@ -363,9 +366,9 @@ func take1Bool(s *stack, op int) (bool, error) {
 }
 
 func take2Bool(s *stack, op int) (bool, bool, error) {
-	a, a_err := take1Bool(s, op)
-	b, b_err := take1Bool(s, op)
-	return a, b, firstError(a_err, b_err)
+	a, aErr := take1Bool(s, op)
+	b, bErr := take1Bool(s, op)
+	return a, b, firstError(aErr, bErr)
 }
 
 func take1Float(s *stack, op int) (float64, error) {
@@ -383,9 +386,9 @@ func take1Float(s *stack, op int) (float64, error) {
 }
 
 func take2Float(s *stack, op int) (float64, float64, error) {
-	a, a_err := take1Float(s, op)
-	b, b_err := take1Float(s, op)
-	return a, b, firstError(a_err, b_err)
+	a, aErr := take1Float(s, op)
+	b, bErr := take1Float(s, op)
+	return a, b, firstError(aErr, bErr)
 }
 
 func take1ByteSlice(s *stack, op int) ([]byte, error) {
@@ -403,9 +406,9 @@ func take1ByteSlice(s *stack, op int) ([]byte, error) {
 }
 
 func take2ByteSlice(s *stack, op int) ([]byte, []byte, error) {
-	a, a_err := take1ByteSlice(s, op)
-	b, b_err := take1ByteSlice(s, op)
-	return a, b, firstError(a_err, b_err)
+	a, aErr := take1ByteSlice(s, op)
+	b, bErr := take1ByteSlice(s, op)
+	return a, b, firstError(aErr, bErr)
 }
 
 func take1Null(s *stack, op int) error {
@@ -422,7 +425,7 @@ func take1Null(s *stack, op int) error {
 }
 
 func take2Null(s *stack, op int) error {
-	a_err := take1Null(s, op)
-	b_err := take1Null(s, op)
-	return firstError(a_err, b_err)
+	aErr := take1Null(s, op)
+	bErr := take1Null(s, op)
+	return firstError(aErr, bErr)
 }

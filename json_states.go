@@ -134,9 +134,9 @@ func stateJSONAfterValue(l lexer, state *intStack) stateFn {
 		case jsonBracketLeft:
 			return stateJSONValue
 		case noValue:
-			return l.errorf("Found %#U outside of array or object", cur)
+			return l.errorf("found %#U outside of array or object", cur)
 		default:
-			return l.errorf("Unexpected character in lexer stack: %#U", cur)
+			return l.errorf("unexpected character in lexer stack: %#U", cur)
 		}
 	case '}':
 		l.emit(jsonBraceRight)
@@ -145,7 +145,7 @@ func stateJSONAfterValue(l lexer, state *intStack) stateFn {
 		case jsonBraceLeft:
 			return stateJSONAfterValue
 		case jsonBracketLeft:
-			return l.errorf("Unexpected %#U in array", cur)
+			return l.errorf("unexpected %#U in array", cur)
 		case noValue:
 			return stateJSONAfterRoot
 		}
@@ -154,7 +154,7 @@ func stateJSONAfterValue(l lexer, state *intStack) stateFn {
 		state.pop()
 		switch topVal {
 		case jsonBraceLeft:
-			return l.errorf("Unexpected %#U in object", cur)
+			return l.errorf("unexpected %#U in object", cur)
 		case jsonBracketLeft:
 			return stateJSONAfterValue
 		case noValue:
@@ -164,11 +164,11 @@ func stateJSONAfterValue(l lexer, state *intStack) stateFn {
 		if state.len() == 0 {
 			l.emit(jsonEOF)
 			return nil
-		} else {
-			return l.errorf("Unexpected EOF instead of value")
 		}
+
+		return l.errorf("unexpected EOF instead of value")
 	default:
-		return l.errorf("Unexpected character after json value token: %#U", cur)
+		return l.errorf("unexpected character after json value token: %#U", cur)
 	}
 	return nil
 }
