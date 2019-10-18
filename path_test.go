@@ -13,15 +13,15 @@ type optest struct {
 }
 
 var optests = []optest{
-	optest{"single key (period) ", `$.aKey`, []int{opTypeName}},
-	optest{"single key (bracket)", `$["aKey"]`, []int{opTypeName}},
-	optest{"single key (period) ", `$.*`, []int{opTypeNameWild}},
-	optest{"single index", `$[12]`, []int{opTypeIndex}},
-	optest{"single key", `$[23:45]`, []int{opTypeIndexRange}},
-	optest{"single key", `$[*]`, []int{opTypeIndexWild}},
+	{"single key (period) ", `$.aKey`, []int{opTypeName}},
+	{"single key (bracket)", `$["aKey"]`, []int{opTypeName}},
+	{"single key (period) ", `$.*`, []int{opTypeNameWild}},
+	{"single index", `$[12]`, []int{opTypeIndex}},
+	{"single key", `$[23:45]`, []int{opTypeIndexRange}},
+	{"single key", `$[*]`, []int{opTypeIndexWild}},
 
-	optest{"double key", `$["aKey"]["bKey"]`, []int{opTypeName, opTypeName}},
-	optest{"double key", `$["aKey"].bKey`, []int{opTypeName, opTypeName}},
+	{"double key", `$["aKey"]["bKey"]`, []int{opTypeName, opTypeName}},
+	{"double key", `$["aKey"].bKey`, []int{opTypeName, opTypeName}},
 }
 
 func TestQueryOperators(t *testing.T) {

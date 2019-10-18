@@ -159,7 +159,7 @@ var examples = []string{
    }`,
 }
 
-func TestMixedCaseJson(t *testing.T) {
+func TestMixedCaseJSON(t *testing.T) {
 	as := assert.New(t)
 	for _, json := range examples {
 		lexer := NewSliceLexer([]byte(json), JSON)

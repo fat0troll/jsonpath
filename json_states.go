@@ -46,16 +46,16 @@ func lexJsonRoot(l lexer, state *intStack) stateFn {
 	var next stateFn
 	switch cur {
 	case '{':
-		next = stateJsonObjectOpen
+		next = stateJSONObjectOpen
 	case '[':
-		next = stateJsonArrayOpen
+		next = stateJSONArrayOpen
 	default:
 		next = l.errorf("Expected '{' or '[' at root of JSON instead of %#U", cur)
 	}
 	return next
 }
 
-func stateJsonObjectOpen(l lexer, state *intStack) stateFn {
+func stateJSONObjectOpen(l lexer, state *intStack) stateFn {
 	cur := l.take()
 	if cur != '{' {
 		return l.errorf("Expected '{' as start of object instead of %#U", cur)
@@ -63,10 +63,10 @@ func stateJsonObjectOpen(l lexer, state *intStack) stateFn {
 	l.emit(jsonBraceLeft)
 	state.push(jsonBraceLeft)
 
-	return stateJsonObject
+	return stateJSONObject
 }
 
-func stateJsonArrayOpen(l lexer, state *intStack) stateFn {
+func stateJSONArrayOpen(l lexer, state *intStack) stateFn {
 	cur := l.take()
 	if cur != '[' {
 		return l.errorf("Expected '[' as start of array instead of %#U", cur)
@@ -74,10 +74,10 @@ func stateJsonArrayOpen(l lexer, state *intStack) stateFn {
 	l.emit(jsonBracketLeft)
 	state.push(jsonBracketLeft)
 
-	return stateJsonArray
+	return stateJSONArray
 }
 
-func stateJsonObject(l lexer, state *intStack) stateFn {
+func stateJSONObject(l lexer, state *intStack) stateFn {
 	var next stateFn
 	cur := l.peek()
 	switch cur {
@@ -89,16 +89,16 @@ func stateJsonObject(l lexer, state *intStack) stateFn {
 		l.take()
 		l.emit(jsonBraceRight)
 		state.pop()
-		next = stateJsonAfterValue
+		next = stateJSONAfterValue
 	case '"':
-		next = stateJsonKey
+		next = stateJSONKey
 	default:
 		next = l.errorf("Expected '}' or \" within an object instead of %#U", cur)
 	}
 	return next
 }
 
-func stateJsonArray(l lexer, state *intStack) stateFn {
+func stateJSONArray(l lexer, state *intStack) stateFn {
 	var next stateFn
 	cur := l.peek()
 	switch cur {
@@ -110,14 +110,14 @@ func stateJsonArray(l lexer, state *intStack) stateFn {
 		l.take()
 		l.emit(jsonBracketRight)
 		state.pop()
-		next = stateJsonAfterValue
+		next = stateJSONAfterValue
 	default:
-		next = stateJsonValue
+		next = stateJSONValue
 	}
 	return next
 }
 
-func stateJsonAfterValue(l lexer, state *intStack) stateFn {
+func stateJSONAfterValue(l lexer, state *intStack) stateFn {
 	cur := l.take()
 	top, ok := state.peek()
 	topVal := noValue
@@ -130,9 +130,9 @@ func stateJsonAfterValue(l lexer, state *intStack) stateFn {
 		l.emit(jsonComma)
 		switch topVal {
 		case jsonBraceLeft:
-			return stateJsonKey
+			return stateJSONKey
 		case jsonBracketLeft:
-			return stateJsonValue
+			return stateJSONValue
 		case noValue:
 			return l.errorf("Found %#U outside of array or object", cur)
 		default:
@@ -143,11 +143,11 @@ func stateJsonAfterValue(l lexer, state *intStack) stateFn {
 		state.pop()
 		switch topVal {
 		case jsonBraceLeft:
-			return stateJsonAfterValue
+			return stateJSONAfterValue
 		case jsonBracketLeft:
 			return l.errorf("Unexpected %#U in array", cur)
 		case noValue:
-			return stateJsonAfterRoot
+			return stateJSONAfterRoot
 		}
 	case ']':
 		l.emit(jsonBracketRight)
@@ -156,9 +156,9 @@ func stateJsonAfterValue(l lexer, state *intStack) stateFn {
 		case jsonBraceLeft:
 			return l.errorf("Unexpected %#U in object", cur)
 		case jsonBracketLeft:
-			return stateJsonAfterValue
+			return stateJSONAfterValue
 		case noValue:
-			return stateJsonAfterRoot
+			return stateJSONAfterRoot
 		}
 	case eof:
 		if state.len() == 0 {
@@ -173,65 +173,65 @@ func stateJsonAfterValue(l lexer, state *intStack) stateFn {
 	return nil
 }
 
-func stateJsonKey(l lexer, state *intStack) stateFn {
+func stateJSONKey(l lexer, state *intStack) stateFn {
 	if err := l.takeString(); err != nil {
 		return l.errorf(err.Error())
 	}
 	l.emit(jsonKey)
 
-	return stateJsonColon
+	return stateJSONColon
 }
 
-func stateJsonColon(l lexer, state *intStack) stateFn {
+func stateJSONColon(l lexer, state *intStack) stateFn {
 	cur := l.take()
 	if cur != ':' {
 		return l.errorf("Expected ':' after key string instead of %#U", cur)
 	}
 	l.emit(jsonColon)
 
-	return stateJsonValue
+	return stateJSONValue
 }
 
-func stateJsonValue(l lexer, state *intStack) stateFn {
+func stateJSONValue(l lexer, state *intStack) stateFn {
 	cur := l.peek()
 
 	switch cur {
 	case eof:
 		return l.errorf("Unexpected EOF instead of value")
 	case '"':
-		return stateJsonString
+		return stateJSONString
 	case '-', '0', '1', '2', '3', '4', '5', '6', '7', '8', '9':
-		return stateJsonNumber
+		return stateJSONNumber
 	case 't', 'f':
-		return stateJsonBool
+		return stateJSONBool
 	case 'n':
-		return stateJsonNull
+		return stateJSONNull
 	case '{':
-		return stateJsonObjectOpen
+		return stateJSONObjectOpen
 	case '[':
-		return stateJsonArrayOpen
+		return stateJSONArrayOpen
 	default:
 		return l.errorf("Unexpected character as start of value: %#U", cur)
 	}
 }
 
-func stateJsonString(l lexer, state *intStack) stateFn {
+func stateJSONString(l lexer, state *intStack) stateFn {
 	if err := l.takeString(); err != nil {
 		return l.errorf(err.Error())
 	}
 	l.emit(jsonString)
-	return stateJsonAfterValue
+	return stateJSONAfterValue
 }
 
-func stateJsonNumber(l lexer, state *intStack) stateFn {
+func stateJSONNumber(l lexer, state *intStack) stateFn {
 	if err := takeJSONNumeric(l); err != nil {
 		return l.errorf(err.Error())
 	}
 	l.emit(jsonNumber)
-	return stateJsonAfterValue
+	return stateJSONAfterValue
 }
 
-func stateJsonBool(l lexer, state *intStack) stateFn {
+func stateJSONBool(l lexer, state *intStack) stateFn {
 	cur := l.peek()
 	var match []byte
 	switch cur {
@@ -245,18 +245,18 @@ func stateJsonBool(l lexer, state *intStack) stateFn {
 		return l.errorf("Could not parse value as 'true' or 'false'")
 	}
 	l.emit(jsonBool)
-	return stateJsonAfterValue
+	return stateJSONAfterValue
 }
 
-func stateJsonNull(l lexer, state *intStack) stateFn {
+func stateJSONNull(l lexer, state *intStack) stateFn {
 	if !takeExactSequence(l, nullBytes) {
 		return l.errorf("Could not parse value as 'null'")
 	}
 	l.emit(jsonNull)
-	return stateJsonAfterValue
+	return stateJSONAfterValue
 }
 
-func stateJsonAfterRoot(l lexer, state *intStack) stateFn {
+func stateJSONAfterRoot(l lexer, state *intStack) stateFn {
 	cur := l.take()
 	if cur != eof {
 		return l.errorf("Expected EOF instead of %#U", cur)

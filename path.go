@@ -93,7 +93,9 @@ func genIndexKey(tr tokenReader) (*operator, error) {
 			return nil, fmt.Errorf("Unexpected value within brackets after index: %q", t.val)
 		}
 	case pathKey:
-		k.keyStrings = map[string]struct{}{string(t.val[1 : len(t.val)-1]): struct{}{}}
+		k.keyStrings = map[string]struct{}{
+			string(t.val[1 : len(t.val)-1]): {},
+		}
 		k.typ = opTypeName
 
 		if t, ok = tr.next(); !ok || t.typ != pathBracketRight {
@@ -185,7 +187,15 @@ func tokensToOperators(tr tokenReader) (*Path, error) {
 			if p.val[0] == '"' && p.val[len(p.val)-1] == '"' {
 				keyName = p.val[1 : len(p.val)-1]
 			}
-			q.operators = append(q.operators, &operator{typ: opTypeName, keyStrings: map[string]struct{}{string(keyName): struct{}{}}})
+			q.operators = append(
+				q.operators,
+				&operator{
+					typ: opTypeName,
+					keyStrings: map[string]struct{}{
+						string(keyName): {},
+					},
+				},
+			)
 		case pathWildcard:
 			q.operators = append(q.operators, &operator{typ: opTypeNameWild})
 		case pathValue:

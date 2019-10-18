@@ -1,0 +1,24 @@
+run:
+  deadline: 2m
+linters:
+  enable-all: true
+  disable:
+    - gochecknoglobals
+    - gocritic
+    - funlen
+linters-settings:
+  lll:
+    line-length: 180
+issues:
+  exclude-rules:
+    - path: _test\.go
+      linters:
+        - dupl
+        - errcheck
+        - gocritic
+        - gocyclo
+        - gosec
+        - lll
+        - goconst
+        - unparam
+        - unused
